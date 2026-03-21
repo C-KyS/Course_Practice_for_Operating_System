@@ -1,5 +1,5 @@
-myshell: main.c
-	gcc -o $@ $^
+myshell: main.cc
+	g++ -o $@ $^
 
 .PHONY: clean
 clean:
