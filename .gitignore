@@ -3,3 +3,6 @@
 .vscode/settings.json
 .vscode/launch.json
 .vscode/tasks.json
+
+# 忽略Lab3_1 可执行文件
+myshell
