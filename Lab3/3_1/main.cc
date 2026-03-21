@@ -274,7 +274,7 @@
 #define MAXARGC 128
 
 // 全局 存储命令行参数
-char *const g_argv[MAXARGC];
+char *g_argv[MAXARGC];
 int g_argc = 0;
 
 // 环境变量获取用户名
@@ -326,11 +326,28 @@ bool GetCommandLine(char *out, int size)
     return true;
 }
 
-// 3. 解析输入命令
-void CommandParse(char *commandline)
+// 解析输入命令
+bool CommandParse(char *commandline)
 {
-
+    // 拆分输入命令, 存入全局变量 g_argv 中
+    g_argc = 0;
+    g_argv[g_argc++] = strtok(commandline, " ");
+    while(g_argv[g_argc++] = strtok(nullptr, " "));
+    g_argc--;
+    return true;
 }
+
+void PrintArgv()
+{
+    int i = 0;
+    while(g_argv[i])
+    {
+        printf("argv[%d] = %s\n", i, g_argv[i]);
+        i++;
+    }
+    printf("g_argc = %d\n", g_argc);
+}
+
 
 int main()
 {
@@ -348,6 +365,9 @@ int main()
 
         // 3. 解析输入命令
         CommandParse(commandline);
+        // PrintArgv();
+
+        // 4. 执行命令
     }
 
     return 0;
