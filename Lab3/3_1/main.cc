@@ -271,6 +271,11 @@
 
 #define COMMAND_SIZE 1024
 #define FORMAT "[%s@%s %s]# "
+#define MAXARGC 128
+
+// 全局 存储命令行参数
+char *const g_argv[MAXARGC];
+int g_argc = 0;
 
 // 环境变量获取用户名
 const char *GetUsername()
@@ -316,20 +321,34 @@ bool GetCommandLine(char *out, int size)
         return false;
 
     out[strlen(out) - 1] = 0; // 去掉换行符
-    if(sizeof(out) == 0)
-        return false;   
+    if (sizeof(out) == 0)
+        return false;
     return true;
+}
+
+// 3. 解析输入命令
+void CommandParse(char *commandline)
+{
+
 }
 
 int main()
 {
-    // 1. 输出命令行提示符
-    PrintCommandPrompt();
+    while (true)
+    { // 1. 输出命令行提示符
+        PrintCommandPrompt();
 
-    // 2. 获取输入的命令
-    char commandline[COMMAND_SIZE]; // 初始化
-    // 获取输入的命令
-    if(GetCommandLine(commandline, sizeof(commandline)))
-        printf("echo: %s\n", commandline);
+        // 2. 获取输入的命令
+        char commandline[COMMAND_SIZE]; // 初始化
+        // 获取输入的命令
+        if (GetCommandLine(commandline, sizeof(commandline)))
+            printf("echo: %s\n", commandline);
+        else
+            continue;
+
+        // 3. 解析输入命令
+        CommandParse(commandline);
+    }
+
     return 0;
 }
