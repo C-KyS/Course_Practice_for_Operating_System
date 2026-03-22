@@ -268,6 +268,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <sys/types.h>
+
+
 
 #define COMMAND_SIZE 1024
 #define FORMAT "[%s@%s %s]# "
@@ -358,9 +361,9 @@ int main()
         // 2. 获取输入的命令
         char commandline[COMMAND_SIZE]; // 初始化
         // 获取输入的命令
-        if (GetCommandLine(commandline, sizeof(commandline)))
-            printf("echo: %s\n", commandline);
-        else
+        if (!(GetCommandLine(commandline, sizeof(commandline))))
+            // printf("echo: %s\n", commandline);
+        // else
             continue;
 
         // 3. 解析输入命令
@@ -368,6 +371,17 @@ int main()
         // PrintArgv();
 
         // 4. 执行命令
+        pid_t id = fork();
+        if(id == 0)
+        {
+            // 子进程   
+            // 程序替换
+            execvp(g_argv[0], g_argv); // 传入全局参数数组
+            exit(1);
+        }
+        // 父进程
+        pid_t rid = waitpid(id, nullptr, 0); // 等待子进程结束    
+
     }
 
     return 0;
