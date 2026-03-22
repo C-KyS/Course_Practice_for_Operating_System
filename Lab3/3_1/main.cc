@@ -270,8 +270,6 @@
 #include <time.h>
 #include <sys/types.h>
 
-
-
 #define COMMAND_SIZE 1024
 #define FORMAT "[%s@%s %s]# "
 #define MAXARGC 128
@@ -335,15 +333,17 @@ bool CommandParse(char *commandline)
     // 拆分输入命令, 存入全局变量 g_argv 中
     g_argc = 0;
     g_argv[g_argc++] = strtok(commandline, " ");
-    while(g_argv[g_argc++] = strtok(nullptr, " "));
+    while (g_argv[g_argc++] = strtok(nullptr, " "))
+        ;
     g_argc--;
-    return true;
+    return g_argc > 0;
 }
 
+// 打印命令行参数列表
 void PrintArgv()
 {
     int i = 0;
-    while(g_argv[i])
+    while (g_argv[i])
     {
         printf("argv[%d] = %s\n", i, g_argv[i]);
         i++;
@@ -351,11 +351,41 @@ void PrintArgv()
     printf("g_argc = %d\n", g_argc);
 }
 
+// 4. (内建命令)检查、执行
+bool CheckandExecBuiltin()
+{
+    if(g_argv[0] == nullptr)
+        return false;
+        
+    std::string cmd(g_argv[0]);
+    if (cmd == "exit")
+    {
+        exit(0);
+    }
+    return false;
+}
+
+// 执行命令
+void ExecuteCommand()
+{
+    pid_t id = fork();
+    if (id == 0)
+    {
+        // 子进程
+        // 程序替换
+        execvp(g_argv[0], g_argv); // 传入全局参数数组
+        fprintf(stderr, "%s: cmd not found\n", g_argv[0]);
+        exit(1);
+    }
+    // 父进程
+    waitpid(id, nullptr, 0); // 等待子进程结束
+}
 
 int main()
 {
     while (true)
-    { // 1. 输出命令行提示符
+    { 
+        // 1. 输出命令行提示符
         PrintCommandPrompt();
 
         // 2. 获取输入的命令
@@ -363,25 +393,20 @@ int main()
         // 获取输入的命令
         if (!(GetCommandLine(commandline, sizeof(commandline))))
             // printf("echo: %s\n", commandline);
-        // else
+            // else
             continue;
 
         // 3. 解析输入命令
-        CommandParse(commandline);
+        if (!CommandParse(commandline))
+            continue;
         // PrintArgv();
 
-        // 4. 执行命令
-        pid_t id = fork();
-        if(id == 0)
-        {
-            // 子进程   
-            // 程序替换
-            execvp(g_argv[0], g_argv); // 传入全局参数数组
-            exit(1);
-        }
-        // 父进程
-        pid_t rid = waitpid(id, nullptr, 0); // 等待子进程结束    
+        // 4. (内建命令)检查、执行
+        if (CheckandExecBuiltin())
+            continue; // 已经执行内建命令, 继续下一轮循环
 
+        // 5. (外部命令)执行命令
+        ExecuteCommand();
     }
 
     return 0;
