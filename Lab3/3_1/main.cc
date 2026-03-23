@@ -374,7 +374,7 @@ void ExecuteCommand()
         // 子进程
         // 程序替换
         execvp(g_argv[0], g_argv); // 传入全局参数数组
-        fprintf(stderr, "%s: cmd not found\n", g_argv[0]);
+        fprintf(stderr, "%s: Command not found\n", g_argv[0]);
         exit(1);
     }
     // 父进程
