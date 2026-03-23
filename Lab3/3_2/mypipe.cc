@@ -1,17 +1,34 @@
 #include <iostream>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <cstring>
 
 void ChildrenWrite(int write_fd)
 {
-    
+    char buffer[1024];
+    int cont = 0;
+    while (true)
+    {
+        snprintf(buffer, sizeof(buffer), "This is child process, PID: %d, cont: %d!", getpid(), cont++);
+        write(write_fd, buffer, strlen(buffer)); 
+        sleep(1); // 每隔1秒写入一次
+    }
 }
 
 void FatherRead(int read_fd)
 {
+    char buffer[1024];
+    while (true)
+    {
+        ssize_t n = read(read_fd, buffer, sizeof(buffer)-1);
+        if(n > 0)
+        {
+            buffer[n] = '\0'; 
+        }
+        std::cout << "Father process read: " << buffer << std::endl;
+    }
     
 }
-
 
 int main()
 {
@@ -36,7 +53,7 @@ int main()
         exit(0);
     }
 
-    // 父进程, 负责读取、
+    // 父进程, 负责读取
     close(pipefd[1]);        // 关闭写端
     FatherRead(pipefd[0]);   // 从管道中读取数据
     waitpid(id, nullptr, 0); // 等待子进程结束
