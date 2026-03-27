@@ -20,6 +20,7 @@ void ChildrenWrite(int write_fd)
 
 void FatherRead(int read_fd)
 {
+    sleep(100); // 等待子进程写入数据
     char buffer[1024];
     while (true)
     {
