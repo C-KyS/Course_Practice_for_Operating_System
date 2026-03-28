@@ -20,7 +20,8 @@ static int __init show_all_kernel_thread_init(void)
         if (p->mm == NULL)
         {
             // 打印进程p的相关信息
-            printk("%-20s%-6d%-6d%-6d%-6d", p->comm, p->pid, p->__state, p->prio,
+            char state_char = task_state_to_char(p);
+            printk("%-20s%-6d%-6c%-6d%-6d", p->comm, p->pid, state_char, p->prio,
                    p->parent->pid);
         }
     }
