@@ -9,3 +9,10 @@ myshell
 cmd1
 cmd2
 cmd3
+
+# 忽略Lab3_2 可执行文件
+mypipe
+mysize
+
+# 忽略Lab5 可执行文件
+myfs
