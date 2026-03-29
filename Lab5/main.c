@@ -11,11 +11,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include "myfs.hpp"
+#include "myfs.h"
 
 
 /** List of builtin commands, followed by their corresponding functions. */
-const char *builtin_str[] = {
+char *builtin_str[] = {
         "format",
         "cd",
         "mkdir",
@@ -35,11 +35,6 @@ int (*builtin_func[])(char **) = {
         &my_format,
         &my_cd,
         &my_mkdir,
-int my_exit_cmd(char **args)
-{
-    (void) args;
-    return my_exit_sys();
-}
         &my_rmdir,
         &my_ls,
         &my_create,
@@ -51,7 +46,7 @@ int my_exit_cmd(char **args)
         &my_close,
         &my_pwd
 };
-        &my_exit_cmd,
+
 int csh_num_builtins(void) {
     return sizeof(builtin_str) / sizeof(char*);
 }
@@ -83,7 +78,7 @@ int csh_launch(char **args)
     }
 
     return 1;
-            tokens = (char **) realloc(tokens, bufsize * sizeof(char*));
+}
 
 /*
  * @brief Execute shell built-in or launch program.
@@ -129,7 +124,7 @@ char *csh_read_line(void)
 char **csh_split_line(char *line)
 {
     int bufsize = CSH_TOK_BUFSIZE, position = 0;
-    char **tokens = (char **) malloc(bufsize * sizeof(char*));
+    char **tokens = malloc(bufsize * sizeof(char*));
     char *token;
 
     if (!tokens) {
@@ -178,16 +173,11 @@ void csh_loop(void)
     } while (status);
 }
 
-/*
- * @brief Main entry point.
- * @param argc Argument count.
- * @param argv Argument vector.
- * @return status code.
- */
+
 int main(int argc, char **argv)
 {
-    start_sys();
-    csh_loop();
+    start_sys(); // 启动文件系统，加载文件系统
+    csh_loop(); // 启动shell
 
     return EXIT_SUCCESS;
 }

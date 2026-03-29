@@ -84,11 +84,11 @@ typedef struct USEROPEN
 } useropen;
 
 /** Global variables. */
-unsigned char *fs_head;               // 虚拟磁盘内存区的起始地址
-useropen openfile_list[MAX_OPENFILE]; /**< File array opened by user. */
-int curdir;                           // 当前文件描述符, 即当前目录的FCB在openfile_list中的下标
-char current_dir[80];                 // 当前文件路径, 例: /home/hy2/
-unsigned char *start;                 /**< Location of the first data block. */
+extern unsigned char *fs_head;               // 虚拟磁盘内存区的起始地址
+extern useropen openfile_list[MAX_OPENFILE]; /**< File array opened by user. */
+extern int curdir;                           // 当前文件描述符, 即当前目录的FCB在openfile_list中的下标
+extern char current_dir[80];                 // 当前文件路径, 例: /home/hy2/
+extern unsigned char *start;                 /**< Location of the first data block. */
 
 int start_sys(void); // 启动文件系统，加载文件系统
 

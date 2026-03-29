@@ -6,7 +6,7 @@
  * @date    2018-12-19 to 2019-1-3
  */
 
-#include "myfs.hpp"
+#include "myfs.h"
 
 unsigned char *fs_head;
 useropen openfile_list[MAX_OPENFILE];
@@ -240,6 +240,8 @@ int my_mkdir(char **args) {
 
     /**< Do mkdir. */
     for (i = 1; args[i] != NULL; i++) {
+        memset(parpath, '\0', PATHLENGTH);
+        memset(dirname, '\0', NAMELENGTH);
         /**< Split path into parent folder and current child folder. */
         get_abspath(path, args[i]);
         end = strrchr(path, '/');
@@ -248,6 +250,7 @@ int my_mkdir(char **args) {
             strcpy(dirname, path + 1);
         } else {
             strncpy(parpath, path, end - path);
+            parpath[end - path] = '\0';
             strcpy(dirname, end + 1);
         }
 
@@ -500,11 +503,10 @@ int my_create(char **args) {
         return 1;
     }
 
-    memset(parpath, '\0', PATHLENGTH);
-    memset(filename, '\0', NAMELENGTH);
-
     /**< Do create */
     for (i = 1; args[i] != NULL; i++) {
+        memset(parpath, '\0', PATHLENGTH);
+        memset(filename, '\0', NAMELENGTH);
         /**< Split parent folder and filename. */
         get_abspath(path, args[i]);
         end = strrchr(path, '/');
@@ -513,6 +515,7 @@ int my_create(char **args) {
             strcpy(filename, path + 1);
         } else {
             strncpy(parpath, path, end - path);
+            parpath[end - path] = '\0';
             strcpy(filename, end + 1);
         }
 
