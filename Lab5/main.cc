@@ -15,7 +15,7 @@
 
 
 /** List of builtin commands, followed by their corresponding functions. */
-char *builtin_str[] = {
+const char *builtin_str[] = {
         "format",
         "cd",
         "mkdir",
@@ -35,6 +35,11 @@ int (*builtin_func[])(char **) = {
         &my_format,
         &my_cd,
         &my_mkdir,
+int my_exit_cmd(char **args)
+{
+    (void) args;
+    return my_exit_sys();
+}
         &my_rmdir,
         &my_ls,
         &my_create,
@@ -46,7 +51,7 @@ int (*builtin_func[])(char **) = {
         &my_close,
         &my_pwd
 };
-
+        &my_exit_cmd,
 int csh_num_builtins(void) {
     return sizeof(builtin_str) / sizeof(char*);
 }
@@ -78,7 +83,7 @@ int csh_launch(char **args)
     }
 
     return 1;
-}
+            tokens = (char **) realloc(tokens, bufsize * sizeof(char*));
 
 /*
  * @brief Execute shell built-in or launch program.
@@ -124,7 +129,7 @@ char *csh_read_line(void)
 char **csh_split_line(char *line)
 {
     int bufsize = CSH_TOK_BUFSIZE, position = 0;
-    char **tokens = malloc(bufsize * sizeof(char*));
+    char **tokens = (char **) malloc(bufsize * sizeof(char*));
     char *token;
 
     if (!tokens) {
