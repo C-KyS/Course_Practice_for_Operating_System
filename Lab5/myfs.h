@@ -14,6 +14,9 @@
 
 #ifndef OPERATOR_SYSTEM_EXP4_SIMPLEFS_H
 #define OPERATOR_SYSTEM_EXP4_SIMPLEFS_H
+#define COMMAND_SIZE 1024
+#define FORMAT "[%s@%s \e[1;34m%s\e[0m ]> \e[032m$\e[0m " // 定义命令行提示符格式
+
 #define BLOCK_SIZE 1024
 #define BLOCK_NUM 1024
 #define DISK_SIZE 1048576 // 定义模拟磁盘大小为1MB

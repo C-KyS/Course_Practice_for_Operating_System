@@ -152,9 +152,37 @@ char **csh_split_line(char *line)
     return tokens;
 }
 
-/*
- * @brief Loop getting input and execting it.
- */
+
+// 环境变量获取用户名
+const char *GetUsername()
+{
+    const char *username = getenv("USER");
+    return username ? username : "None";
+}
+
+// 环境变量获取主机名
+const char *GetHostname()
+{
+    const char *hostname = getenv("HOSTNAME");
+    return hostname ? hostname : "None";
+}
+
+// 制作命令行提示符
+void MakeCommandPrompt(char prompt[], int size)
+{
+    snprintf(prompt, COMMAND_SIZE, FORMAT, GetUsername(), GetHostname(), current_dir);
+}
+
+// 打印命令行提示符
+void PrintCommandPrompt()
+{
+    char prompt[COMMAND_SIZE];
+    MakeCommandPrompt(prompt, sizeof(prompt));
+    printf("%s", prompt);
+    fflush(stdout);
+}
+
+// shell 主函数
 void csh_loop(void)
 {
     char *line;
@@ -162,8 +190,9 @@ void csh_loop(void)
     int status;
 
     do {
-        printf("\n\e[1mleslie\e[0m@leslie-PC \e[1m%s\e[0m\n", current_dir);
-        printf("> \e[032m$\e[0m ");
+        // printf("\n\e[1mleslie\e[0m@leslie-PC \e[1m%s\e[0m\n", current_dir);
+        PrintCommandPrompt();
+        // printf("> \e[032m$\e[0m ");
         line = csh_read_line();
         args = csh_split_line(line);
         status = csh_execute(args);
