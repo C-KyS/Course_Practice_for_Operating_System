@@ -1,10 +1,3 @@
-/**
- * @file    main.c
- * @brief
- * @author
- * @date    2018-12-19 to 2019-1-3
- */
-
 #include <sys/wait.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -15,6 +8,7 @@
 
 
 /** List of builtin commands, followed by their corresponding functions. */
+// 可实现的命令列表
 char *builtin_str[] = {
         "format",
         "cd",
@@ -31,6 +25,7 @@ char *builtin_str[] = {
         "pwd"
 };
 
+// 对应命令的函数指针数组
 int (*builtin_func[])(char **) = {
         &my_format,
         &my_cd,
@@ -55,6 +50,7 @@ int csh_num_builtins(void) {
  * @param args Null terminated list of arguments.
  * @return Always return 1, to continue executing.
  */
+// 外部命令, 
 int csh_launch(char **args)
 {
     pid_t pid, wpid;
@@ -62,16 +58,16 @@ int csh_launch(char **args)
 
     pid = fork();
     if (pid == 0) {
-        // Child process
+        // 子进程
         if (execvp(args[0], args) == -1) {
             perror("csh");
         }
         exit(EXIT_FAILURE);
     } else if (pid < 0) {
-        // Error forking
+        // fork失败
         perror("csh");
     } else {
-        // Parent process
+        // 父进程
         do {
             wpid = waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
@@ -85,20 +81,23 @@ int csh_launch(char **args)
  * @param args Null terminated list of arguments.
  * @return 1 if the shell should continue running, 0 if it should terminate.
  */
+// 执行命令, 包括内建命令或外部命令
 int csh_execute(char **args)
 {
     int i;
     if (args[0] == NULL) {
-        // An empty command was entered
+        // 输入为空
         return 1;
     }
 
+    // 检查是否是内建命令
     for (i = 0; i < csh_num_builtins(); i++) {
         if (strcmp(args[0], builtin_str[i]) == 0) {
             return (*builtin_func[i])(args);
         }
     }
 
+    // 不是内建命令，执行外部命令
     return csh_launch(args);
 }
 
@@ -106,6 +105,7 @@ int csh_execute(char **args)
  * @brief Read a line of input from stdin.
  * @return The line from stdin.
  */
+// 读取用户输入
 char *csh_read_line(void)
 {
     char *line = NULL;
@@ -121,6 +121,7 @@ char *csh_read_line(void)
  * @param line The line.
  * @return Null-terminated array of tokens.
  */
+// 输入字符串分割
 char **csh_split_line(char *line)
 {
     int bufsize = CSH_TOK_BUFSIZE, position = 0;
@@ -193,9 +194,9 @@ void csh_loop(void)
         // printf("\n\e[1mleslie\e[0m@leslie-PC \e[1m%s\e[0m\n", current_dir);
         PrintCommandPrompt();
         // printf("> \e[032m$\e[0m ");
-        line = csh_read_line();
-        args = csh_split_line(line);
-        status = csh_execute(args);
+        line = csh_read_line(); // 读取用户输入
+        args = csh_split_line(line); // 输入字符串分割
+        status = csh_execute(args); // 执行命令
 
         free(line);
         free(args);
