@@ -7,7 +7,7 @@
 #include "myfs.h"
 
 
-/** List of builtin commands, followed by their corresponding functions. */
+
 // 可实现的命令列表
 char *builtin_str[] = {
         "format",
@@ -45,12 +45,9 @@ int (*builtin_func[])(char **) = {
 int csh_num_builtins(void) {
     return sizeof(builtin_str) / sizeof(char*);
 }
-/*
- * @brief Launch a program and wait for it to terminate
- * @param args Null terminated list of arguments.
- * @return Always return 1, to continue executing.
- */
-// 外部命令, 
+
+
+// 外部命令
 int csh_launch(char **args)
 {
     pid_t pid, wpid;
@@ -76,11 +73,6 @@ int csh_launch(char **args)
     return 1;
 }
 
-/*
- * @brief Execute shell built-in or launch program.
- * @param args Null terminated list of arguments.
- * @return 1 if the shell should continue running, 0 if it should terminate.
- */
 // 执行命令, 包括内建命令或外部命令
 int csh_execute(char **args)
 {

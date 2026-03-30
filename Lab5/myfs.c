@@ -29,8 +29,8 @@ int start_sys(void) {
         // 没有找到 SYS_PATH 文件，进行初始化。
         printf("System is not initialized, now install it and create system file.\n");
         printf("Please don't leave program.\n");
-        printf("Initialed success!\n");
         do_format(); // 初始化文件系统
+        printf("Initialed success!\n");
     }
 
     // 初始化openfile_list[0], 第一个FCB, 即根目录
@@ -59,16 +59,13 @@ int start_sys(void) {
     return 0;
 }
 
-/**
- * Entry for command "format".
- * @author Leslie Van
- */
+// 负责format命令函数
 int my_format(char **args) {
     unsigned char *ptr;
     FILE *fp;
     int i;
 
-    /**< Check argument count. */
+    // 检查参数数量, format命令最多只能有一个参数, 即长度最多为2
     for (i = 0; args[i] != NULL; i++);
     if (i > 2) {
         fprintf(stderr, "format: expected argument to \"format\"\n");
