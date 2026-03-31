@@ -8,11 +8,11 @@
 
 #include "myfs.h"
 
-unsigned char *fs_head;
-useropen openfile_list[MAX_OPENFILE];
-int curdir;
-char current_dir[80];
-unsigned char *start;
+// unsigned char *fs_head;
+// useropen openfile_list[MAX_OPENFILE];
+// int curdir;
+// char current_dir[80];
+// unsigned char *start;
 
 
 // 启动文件系统，加载文件系统
@@ -102,25 +102,24 @@ int do_format(void) {
     int first, second;
     FILE *fp;
 
-    /**< Init the boot block(block0). */
+    /**初始化引导块. */
     block0 *init_block = (block0 *) ptr;
     strcpy(init_block->information,
            "Disk Size = 1MB, Block Size = 1KB, Block0 in 0, FAT0/1 in 1/3, Root Directory in 5");
     init_block->root = 5;
-    init_block->start_block = (unsigned char *) (init_block + BLOCK_SIZE * 7);
+    init_block->start_block = (unsigned char *) (init_block + BLOCK_SIZE * 7); // 
     ptr += BLOCK_SIZE;
 
-    /**< Init FAT0/1. */
+    /**< 初始化FAT0 FAT1 */
     set_free(0, 0, 2);
 
-    /**< Allocate 5 blocks to one block0(1) and two fat(2). */
+    /**< 分配5个盘块, 1个给BLOCK0, 2个给FAT0, 2个给FAT */
     set_free(get_free(1), 1, 0);
     set_free(get_free(2), 2, 0);
     set_free(get_free(2), 2, 0);
-
     ptr += BLOCK_SIZE * 4;
 
-    /**< 2 blocks to root directory. */
+    /**< 分配2个盘块给根目录 */
     fcb *root = (fcb *) ptr;
     first = get_free(ROOT_BLOCK_NUM);
     set_free(first, ROOT_BLOCK_NUM, 0);
@@ -128,7 +127,7 @@ int do_format(void) {
     root++;
     set_fcb(root, "..", "di", 0, first, BLOCK_SIZE * 2, 1);
     root++;
-
+    //
     for (i = 2; i < BLOCK_SIZE * 2 / sizeof(fcb); i++, root++) {
         root->free = 0;
     }
@@ -378,12 +377,12 @@ void do_rmdir(fcb *dir) {
  * @return Always 1.
  */
 int my_ls(char **args) {
-    int first = openfile_list[curdir].open_fcb.first;
-    int i, mode = 'n';
+    int first = openfile_list[curdir].open_fcb.first; // 当前目录的起始盘块号
+    int i, mode = 'n'; // 默认mode为普通格式
     int flag[3];
     fcb *dir;
 
-    /**< Check argument count. */
+    /**< 检查输入命令合法性1: 参数数量*/
     for (i = 0; args[i] != NULL; i++) {
         flag[i] = 0;
     }
@@ -392,6 +391,7 @@ int my_ls(char **args) {
         return 1;
     }
 
+    /**< 检查输入命令合法性2: -l*/
     flag[0] = 1;
     for (i = 1; args[i] != NULL; i++) {
         if (args[i][0] == '-') {
@@ -406,6 +406,7 @@ int my_ls(char **args) {
         }
     }
 
+    /**< 检查输入命令合法性2: -文件名 */
     for (i = 1; args[i] != NULL; i++) {
         if (flag[i] == 0) {
             dir = find_fcb(args[i]);
@@ -426,14 +427,16 @@ int my_ls(char **args) {
 
 /**
  * Just do ls.
- * @param first First block of folder you want to show.
- * @param mode 'n' to normal format, and 'l' to long format.
+ * 运行ls
+ * @param first 起始盘块号
+ * @param mode 'n': 普通格式; 'l': 长格式
  */
 void do_ls(int first, char mode) {
     int i, count, length = BLOCK_SIZE;
     char fullname[NAMELENGTH], date[16], time[16];
-    fcb *root = (fcb *) (fs_head + BLOCK_SIZE * first);
-    block0 *init_block = (block0 *) fs_head;
+    fcb *root = (fcb *) (fs_head + BLOCK_SIZE * first); // 获取目标目录起始地址
+    block0 *init_block = (block0 *) fs_head; // 获取引导块
+    
     if (first == init_block->root) {
         length = ROOT_BLOCK_NUM * BLOCK_SIZE;
     }
@@ -445,15 +448,15 @@ void do_ls(int first, char mode) {
                 continue;
             }
 
-            if (root->attribute == 0) {
+            if (root->attribute == 0) { // 目录文件
                 printf("%s", FOLDER_COLOR);
                 printf("%s\t", root->filename);
                 printf("%s", DEFAULT_COLOR);
-            } else {
+            } else { // 普通文件
                 get_fullname(fullname, root);
                 printf("%s\t", fullname);
             }
-            if (count % 5 == 0) {
+            if (count % 5 == 0) { // 每行显示5个文件
                 printf("\n");
             }
             count++;
@@ -1138,7 +1141,7 @@ int get_free(int count) {
         } else {
             return i;
         }
-    }
+    } 
 
     return -1;
 }
@@ -1147,8 +1150,7 @@ int get_free(int count) {
  * Change value of FAT.
  * @param first The starting block number.
  * @param length The blocks count.
- * @param mode 0 to allocate, 1 to reclaim and 2 to format.
- * @author Leslie Van
+ * @param mode 0: 分配盘块, 1: 回收盘块, 2: 格式化盘块.
  */
 int set_free(unsigned short first, unsigned short length, int mode) {
     fat *flag = (fat *) (fs_head + BLOCK_SIZE);
@@ -1157,10 +1159,10 @@ int set_free(unsigned short first, unsigned short length, int mode) {
     int i;
     int offset;
 
-    for (i = 0; i < first; i++, fat0++, fat1++);
+    for (i = 0; i < first; i++, fat0++, fat1++); // 定位到起始盘块
 
     if (mode == 1) {
-        /**< Reclaim space. */
+        /**< 回收盘块 */
         while (fat0->id != END) {
             offset = fat0->id - (fat0 - flag) / sizeof(fat);
             fat0->id = FREE;
@@ -1171,7 +1173,7 @@ int set_free(unsigned short first, unsigned short length, int mode) {
         fat0->id = FREE;
         fat1->id = FREE;
     } else if (mode == 2) {
-        /**< Format FAT */
+        /**< 格式化FAT */
         for (i = 0; i < BLOCK_NUM; i++, fat0++, fat1++) {
             fat0->id = FREE;
             fat1->id = FREE;
@@ -1190,7 +1192,7 @@ int set_free(unsigned short first, unsigned short length, int mode) {
 }
 
 /**
- * Set fcb attribute.
+ * 设置FCB属性
  * @param f The pointer of fcb.
  * @param filename FCB filename.
  * @param exname FCB file extensions name.
@@ -1280,9 +1282,10 @@ fcb *fcb_cpy(fcb *dest, fcb *src) {
 
 /**
  * Translate relative path to absolute path
- * @param abspath Absolute path.
- * @param relpath Relative path.
- * @return Absolute path.
+ * 通过相对路径获取绝对路径
+ * @param abspath 绝对路径
+ * @param relpath 相对路径
+ * @return 绝对路径
  */
 char *get_abspath(char *abspath, const char *relpath) {
     /**< If relpath is abspath. */
@@ -1328,7 +1331,7 @@ char *get_abspath(char *abspath, const char *relpath) {
 }
 
 /**
- * Find fcb by abspath.
+ * 通过路径寻找fcb。
  * @param path File path.
  * @return File fcb pointer.
  */

@@ -32,7 +32,7 @@
  */
 typedef struct BLOCK0
 {
-    char information[200]; // 存储一些描述信息, 如磁盘块大小、磁盘块数量等
+    char information[200];      // 存储一些描述信息, 如磁盘块大小、磁盘块数量等
     unsigned short root;        /**根目录文件的起始盘块号 */
     unsigned char *start_block; /**< 虚拟磁盘上数据区开始位置 */
 } block0;
@@ -51,7 +51,7 @@ typedef struct FCB
     unsigned short date;       // 文件创建日期
     unsigned short first;      // 文件起始盘块号
     unsigned long length;      // 文件长度
-    char free;
+    char free;                 // 文件是否被占用, 0为占用, 1为未占用
 } fcb;
 
 /**
@@ -59,7 +59,7 @@ typedef struct FCB
  * 记录下一个磁盘块的盘号.
  * END值代表文件结束, FREE值代表盘块空闲.
  */
-typedef struct FAT
+typedef struct id
 {
     unsigned short id;
 } fat;
@@ -79,12 +79,12 @@ typedef struct USEROPEN
     char free;      // 打开表项是否为空, 若为0 则为空, 1为不空
 } useropen;
 
-/** Global variables. */
+/** 全局变量 */
 extern unsigned char *fs_head;               // 虚拟磁盘内存区的起始地址
 extern useropen openfile_list[MAX_OPENFILE]; /**用户打开文件表useropen数组 */
 extern int curdir;                           // 当前文件描述符, 即当前目录的FCB在openfile_list中的下标
 extern char current_dir[80];                 // 当前文件路径, 例: /home/hy2/
-extern unsigned char *start;                 /**虚拟磁盘的起始地址 */
+extern unsigned char *start;                 /**虚拟磁盘数据区的起始地址 */
 
 int start_sys(void); // 启动文件系统，加载文件系统
 
