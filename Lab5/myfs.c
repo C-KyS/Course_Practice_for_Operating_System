@@ -432,18 +432,18 @@ int my_ls(char **args) {
  * @param mode 'n': 普通格式; 'l': 长格式
  */
 void do_ls(int first, char mode) {
-    int i, count, length = BLOCK_SIZE;
+    int i, count, length = BLOCK_SIZE; // 默认长度为1个盘块
     char fullname[NAMELENGTH], date[16], time[16];
     fcb *root = (fcb *) (fs_head + BLOCK_SIZE * first); // 获取目标目录起始地址
     block0 *init_block = (block0 *) fs_head; // 获取引导块
     
     if (first == init_block->root) {
-        length = ROOT_BLOCK_NUM * BLOCK_SIZE;
+        length = ROOT_BLOCK_NUM * BLOCK_SIZE; // 根目录有2个盘块
     }
 
     if (mode == 'n') {
         for (i = 0, count = 1; i < length / sizeof(fcb); i++, root++) {
-            /**< Check if the fcb is used. */
+            /**< 检查这个fcb对应文件是否有效 */
             if (root->free == 0) {
                 continue;
             }
