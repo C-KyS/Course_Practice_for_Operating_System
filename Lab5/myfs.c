@@ -93,9 +93,8 @@ int my_format(char **args) {
 }
 
 /**
- * Fast format file system.
- * Create boot block, file allocation tables and root directory.
- * @author Leslie Van
+ * 初始化文件系统
+ * 创建引导块、文件分配表和根目录.
  */
 int do_format(void) {
     unsigned char *ptr = fs_head;

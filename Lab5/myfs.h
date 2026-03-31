@@ -1,11 +1,3 @@
-/**
- * @file    simplefs.h
- * @brief   Setup in FAT16 file system.
- * @details Macro definitions, structs such as FCB and FAT, and some global variable.
- * @author  Leslie Van
- * @date    2018-12-19 to 2019-1-3
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,11 +13,11 @@
 #define BLOCK_NUM 1024
 #define DISK_SIZE 1048576 // 定义模拟磁盘大小为1MB
 #define SYS_PATH "./fsfile"
-#define END 0xffff       /**< End of the block, a flag in FAT. */
-#define FREE 0x0000      /**< Unused block, a flag in FAT. */
-#define ROOT "/"         /**< Root directory name.*/
-#define ROOT_BLOCK_NUM 2 /**< Block of the initial root directory. */
-#define MAX_OPENFILE 10  /**< Max files to open at the same time. */
+#define END 0xffff       /**FAT中的文件结束标志 */
+#define FREE 0x0000      /**FAT中的盘块空闲标志 */
+#define ROOT "/"         /**根目录*/
+#define ROOT_BLOCK_NUM 2 /**< 根目录初始所占盘块总数 */
+#define MAX_OPENFILE 10  /**< 最多同时打开文件个数 */
 #define NAMELENGTH 32
 #define PATHLENGTH 128
 #define DELIM "/"
@@ -34,37 +26,38 @@
 #define WRITE_SIZE 20 * BLOCK_SIZE
 
 /**
- * @brief Store virtual disk information.
- * Contain info like block size, block count and some other information about disk.
+ * 引导块BLOCK0
+ * 存放虚拟磁盘相关信息
+ * 比如磁盘块大小、磁盘块数量等
  */
 typedef struct BLOCK0
 {
-    char information[200];
-    unsigned short root;        /**< Block number of the root directory. */
-    unsigned char *start_block; /**< Location of the first data block. */
+    char information[200]; // 存储一些描述信息, 如磁盘块大小、磁盘块数量等
+    unsigned short root;        /**根目录文件的起始盘块号 */
+    unsigned char *start_block; /**< 虚拟磁盘上数据区开始位置 */
 } block0;
 
 /**
- * @brief File control block.
- * Store file info both the description and current state.
+ * FCB
+ * 文件静态信息表
  */
 typedef struct FCB
 {
-    char filename[8];
-    char exname[3];
-    unsigned char attribute; /**< 0: directory or 1: file. */
-    unsigned char reserve[10];
-    unsigned short time;  /**< File create time. */
-    unsigned short date;  /**< File create date. */
-    unsigned short first; /**< First block num of the file. */
-    unsigned long length; /**< Block count of the file. */
+    char filename[8];          // 文件名
+    char exname[3];            // 文件扩展名
+    unsigned char attribute;   // 文件属性, 0x00为文件, 0x01为目录
+    unsigned char reserve[10]; //
+    unsigned short time;       // 文件创建时间
+    unsigned short date;       // 文件创建日期
+    unsigned short first;      // 文件起始盘块号
+    unsigned long length;      // 文件长度
     char free;
 } fcb;
 
 /**
- * @brief File allocation table.
- * Record the next block num of file.
- * When value is 0xffff, this block is the last block of the file.
+ * FAT.
+ * 记录下一个磁盘块的盘号.
+ * END值代表文件结束, FREE值代表盘块空闲.
  */
 typedef struct FAT
 {
@@ -72,26 +65,26 @@ typedef struct FAT
 } fat;
 
 /**
- * @brief A file entry opened by user.
- * Contain file control block and current state.
+用户打开文件表
  */
 typedef struct USEROPEN
 {
     /** FCB. */
     fcb open_fcb;
-    /** Current state. */
-    char dir[80]; // 
-    int count;
-    char fcb_state;
-    char free;
+
+    /** 文件使用动态信息 */
+    char dir[80];   // 打开文件路径
+    int count;      // 读写指针位置
+    char fcb_state; // FCB是否被修改过, 0为未修改, 1为修改过
+    char free;      // 打开表项是否为空, 若为0 则为空, 1为不空
 } useropen;
 
 /** Global variables. */
 extern unsigned char *fs_head;               // 虚拟磁盘内存区的起始地址
-extern useropen openfile_list[MAX_OPENFILE]; /**< File array opened by user. */
+extern useropen openfile_list[MAX_OPENFILE]; /**用户打开文件表useropen数组 */
 extern int curdir;                           // 当前文件描述符, 即当前目录的FCB在openfile_list中的下标
 extern char current_dir[80];                 // 当前文件路径, 例: /home/hy2/
-extern unsigned char *start;                 /**< Location of the first data block. */
+extern unsigned char *start;                 /**虚拟磁盘的起始地址 */
 
 int start_sys(void); // 启动文件系统，加载文件系统
 
