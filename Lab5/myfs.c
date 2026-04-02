@@ -215,10 +215,10 @@ int my_pwd(char **args) {
 }
 
 /**
- * Create one or many directory once.
+ * 创建一个或多个目录 Create one or many directory once.
  * Provide function to create two or more directory once.
- * If par folder not exists, print error, others will continue.
- * @param args Folder names.
+ * If par folder not exists, print error, others will continue. 
+ * @param args 目录名 Folder names.
  * @return Always 1.
  */
 int my_mkdir(char **args) {
@@ -227,26 +227,27 @@ int my_mkdir(char **args) {
     char parpath[PATHLENGTH], dirname[NAMELENGTH];
     char *end;
 
-    /**< Check argument count. */
+    /**< 检查命令输入参数是否为空 */
     if (args[1] == NULL) {
         fprintf(stderr, "mkdir: missing operand\n");
         return 1;
     }
 
-    /**< Do mkdir. */
+    // mkdir a b c/d 
+    /**< 循环, 对于每个目录名进行do_mkdir */
     for (i = 1; args[i] != NULL; i++) {
         memset(parpath, '\0', PATHLENGTH);
         memset(dirname, '\0', NAMELENGTH);
         /**< Split path into parent folder and current child folder. */
-        get_abspath(path, args[i]);
+        get_abspath(path, args[i]); // path = 绝对路径
         end = strrchr(path, '/');
-        if (end == path) {
+        if (end == path) { // /abc
             strcpy(parpath, "/");
             strcpy(dirname, path + 1);
-        } else {
+        } else { // /abc/d
             strncpy(parpath, path, end - path);
-            parpath[end - path] = '\0';
-            strcpy(dirname, end + 1);
+            parpath[end - path] = '\0'; // parpath = /abc
+            strcpy(dirname, end + 1); // dirname = d
         }
 
         if (find_fcb(parpath) == NULL) {
@@ -265,23 +266,25 @@ int my_mkdir(char **args) {
 }
 
 /**
- * Just do create directory.
- * @param parpath Par folder of the folder you want to create.
+ * 创建目录 Just do create directory. /a/b/c
+ * @param parpath Par folder of the folder you want to create. /a/b
  * @param dirname Folder name you want to create.
  * @return Error with -1, else return 0.
  */
 int do_mkdir(const char *parpath, const char *dirname) {
     int second = get_free(1);
     int i, flag = 0, first = find_fcb(parpath)->first;
-    fcb *dir = (fcb *) (fs_head + BLOCK_SIZE * first);
+    fcb *dir = (fcb *) (fs_head + BLOCK_SIZE * first); // 盘号 -> 内存地址
 
-    /**< Check for free fcb. */
+    /**< 查找可用的fcb */
     for (i = 0; i < BLOCK_SIZE / sizeof(fcb); i++, dir++) {
         if (dir->free == 0) {
             flag = 1;
             break;
         }
     }
+
+    // 没有可用的fcb
     if (!flag) {
         fprintf(stderr, "mkdir: Cannot create more file in %s\n", parpath);
         return -1;
@@ -1111,8 +1114,9 @@ int my_exit_sys(void) {
 }
 
 /**
+ * 在FAT中检测空闲盘块
  * Detect free blocks in FAT.
- * @param count Count of needed blocks.
+ * @param count 需要的block数量 Count of needed blocks.
  * @return 0 without enough space, else return the first block number.
  * @author Leslie Van
  */
@@ -1122,7 +1126,7 @@ int get_free(int count) {
     int i, j, flag = 0;
     int fat[BLOCK_NUM];
 
-    /** Copy FAT. */
+    /** 拷贝FAT至fat. */
     for (i = 0; i < BLOCK_NUM; i++, fat0++) {
         fat[i] = fat0->id;
     }
