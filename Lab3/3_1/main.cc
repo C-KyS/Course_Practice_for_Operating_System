@@ -389,21 +389,17 @@ int main()
         PrintCommandPrompt();
 
         // 2. 获取输入的命令
-        char commandline[COMMAND_SIZE]; // 初始化
-        // 获取输入的命令
+        char commandline[COMMAND_SIZE]; 
         if (!(GetCommandLine(commandline, sizeof(commandline))))
-            // printf("echo: %s\n", commandline);
-            // else
             continue;
 
         // 3. 解析输入命令
         if (!CommandParse(commandline))
             continue;
-        // PrintArgv();
 
         // 4. (内建命令)检查、执行
         if (CheckandExecBuiltin())
-            continue; // 已经执行内建命令, 继续下一轮循环
+            continue; 
 
         // 5. (外部命令)执行命令
         ExecuteCommand();
