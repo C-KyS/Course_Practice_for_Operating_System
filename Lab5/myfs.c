@@ -8,11 +8,11 @@
 
 #include "myfs.h"
 
-// unsigned char *fs_head;
-// useropen openfile_list[MAX_OPENFILE];
-// int curdir;
-// char current_dir[80];
-// unsigned char *start;
+unsigned char *fs_head;
+useropen openfile_list[MAX_OPENFILE];
+int curdir;
+char current_dir[80];
+unsigned char *start;
 
 
 // 启动文件系统，加载文件系统
