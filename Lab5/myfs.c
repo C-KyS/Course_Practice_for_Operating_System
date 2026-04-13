@@ -113,7 +113,7 @@ int do_format(void) {
     /**< 初始化FAT0 FAT1 */
     set_free(0, 0, 2);
 
-    /**< 分配5个盘块, 1个给BLOCK0, 2个给FAT0, 2个给FAT */
+    /**< 分配5个盘块, 1个给BLOCK0, 2个给FAT0, 2个给FAT1 */
     set_free(get_free(1), 1, 0);
     set_free(get_free(2), 2, 0);
     set_free(get_free(2), 2, 0);
