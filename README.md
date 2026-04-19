@@ -1,6 +1,6 @@
 # Course_Practice_for_Operating_System
 
-杭电操作系统课程实践。
+杭电操作系统课程实践。参考仓库 https://github.com/leslievan/Operator_System
 
 ## 项目目录树
 
