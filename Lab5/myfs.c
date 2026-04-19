@@ -65,7 +65,7 @@ int my_format(char **args) {
     FILE *fp;
     int i;
 
-    // 检查参数数量, format命令最多只能有一个参数, 即长度最多为2
+    // 检查参数数量
     for (i = 0; args[i] != NULL; i++);
     if (i > 2) {
         fprintf(stderr, "format: expected argument to \"format\"\n");
@@ -113,7 +113,7 @@ int do_format(void) {
     /**< 初始化FAT0 FAT1 */
     set_free(0, 0, 2);
 
-    /**< 分配5个盘块, 1个给BLOCK0, 2个给FAT0, 2个给FAT1 */
+    /**< 分配5个盘块 */
     set_free(get_free(1), 1, 0);
     set_free(get_free(2), 2, 0);
     set_free(get_free(2), 2, 0);
